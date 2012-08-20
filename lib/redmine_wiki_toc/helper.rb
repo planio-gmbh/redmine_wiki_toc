@@ -14,7 +14,7 @@ module RedmineWikiToc
       highlight = options[:highlight]
       parent = options[:parent] && options[:parent].visible? && options.delete(:parent)
       reorder = options[:reorder_links] && User.current.allowed_to?(:reorder_wiki_pages, options[:project] || @project)
-      node_id = node ? node.id : nil
+      node_id = node.try(&:id)
       unless depth
         content << "<div class='wiki-toc #{"reorder" if reorder}'>"
         if parent

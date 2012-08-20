@@ -1,3 +1,5 @@
+require 'redmine/wiki_formatting/macros'
+
 module RedmineWikiIndex
   module Macros
     Redmine::WikiFormatting::Macros.register do
@@ -12,35 +14,34 @@ module RedmineWikiIndex
              "  !{{wiki_toc(root=1)}} -- shows entire page hierarchy from root"
       macro :wiki_toc do |obj, args|
         args, options = extract_macro_options(args, :parent, :depth, :root, :header, :reorder, :highlight)
+        page = nil
         if args.size > 0
           page = Wiki.find_page(args.first.to_s, :project => @project)
           raise 'Page not found' if page.nil? || !page.visible?
-          wiki = page.wiki
-        elsif @page && obj.page.wiki.sidebar == obj.page
-          page = @page
-          wiki = page.wiki
-        elsif obj.is_a?(WikiContent) || obj.is_a?(WikiContent::Version)
-          page = obj.page
-          wiki = page.wiki
-        else
-          page = nil
-          wiki = @project && @project.wiki
+        elsif obj.respond_to?(:page)
+          page = obj.page == obj.page.wiki.sidebar ? @page : obj.page
         end
-        project = wiki && wiki.project
+        wiki = page && page.wiki || @project && @project.wiki
+        project = page && page.project || @project
         return unless project && project.module_enabled?(:wiki_toc)
         return "" unless User.current.allowed_to?(:view_wiki_toc, project)
-        if !page || options[:root] || options[:parent] && !page.parent_id
-          start_page = nil
-          pages = wiki.pages.reorder(:position)
-        else
-          start_page = options[:parent] ? page.parent : page
-          pages = [start_page] + start_page.children
+        if page
+          if options[:root] || options[:parent] && !page.parent_id
+            start_page = nil
+            pages = wiki.pages.where(:parent_id => nil)
+          else
+            start_page = options[:parent] ? page.parent : page
+            pages = [start_page] + start_page.children
+          end
           pages += page.descendants if page
           pages.uniq!
           pages.sort_by! {|p| p.position}
+        else
+          start_page = nil
+          pages = wiki.pages.reorder(:position)
         end
-        return "" if pages.empty?
         pages = pages.group_by(&:parent_id)
+        return "" unless pages[start_page.try(&:id)]
         options.merge! :depth => options[:depth] && options[:depth].to_i,
           :highlight => options[:highlight] && page,
           :parent => options[:parent] && page && page.parent,
