@@ -21,6 +21,7 @@ Redmine::Plugin.register :redmine_wiki_toc do
   author 'Anton Argirov'
   author_url 'http://redmine.academ.org'
   description 'Adds ability to reorder wiki pages and show an ordered table of contents of Wiki'
+  requires_redmine :version_or_higher => '2.0.0'
   url "http://redmine.academ.org"
   version '0.0.1'
 
