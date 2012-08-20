@@ -1,0 +1,31 @@
+div.wiki-toc {
+  position: relative;
+}
+
+div.wiki-toc.reorder {
+  padding-left: 50px;
+}
+
+div.wiki-toc ul {
+  list-style: none;
+  padding-left: 20px;
+  margin-bottom: 0;
+}
+
+#sidebar div.wiki-toc ul {
+  padding-left: 10px;
+}
+
+#sidebar div.wiki-toc.reorder {
+  padding-left: 60px;
+}
+
+div.wiki-toc .reorder-links {
+  position: absolute;
+  left: 0;
+}
+
+div.wiki-toc a.current {
+  font-weight: bold;
+}
+

@@ -1,0 +1,3 @@
+<% if authorize_for('wiki', 'table_of_contents') %>
+<%= link_to l(:label_table_of_contents), {:controller => 'wiki', :project_id => @project, :action => 'table_of_contents'} %><br />
+<% end %>
