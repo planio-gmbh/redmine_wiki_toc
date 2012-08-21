@@ -47,7 +47,7 @@ module RedmineWikiIndex
           :parent => options[:parent] && page && page.parent,
           :reorder_links => options[:reorder].present?,
           :project => project
-        content = ""
+        content = "".html_safe
         content << content_tag('h3', link_to(options[:header], {:controller => 'wiki', :action => 'table_of_contents', :project_id => project})) if options[:header]
         content << render_wiki_toc(pages, start_page, options)
       end
