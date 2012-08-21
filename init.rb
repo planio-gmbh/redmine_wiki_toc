@@ -11,6 +11,9 @@ Rails.configuration.to_prepare do
   unless WikiController.include?(RedmineWikiToc::WikiControllerPatch)
     WikiController.send :include, RedmineWikiToc::WikiControllerPatch
   end
+  unless WikiHelper.include?(RedmineWikiToc::WikiHelperPatch)
+    WikiHelper.send :include, RedmineWikiToc::WikiHelperPatch
+  end
   unless ApplicationHelper.include?(RedmineWikiToc::ApplicationHelperPatch)
     ApplicationHelper.send :include, RedmineWikiToc::ApplicationHelperPatch
   end
