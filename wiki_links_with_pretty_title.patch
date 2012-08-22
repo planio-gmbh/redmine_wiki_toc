@@ -1,0 +1,13 @@
+diff --git b/app/helpers/application_helper.rb a/app/helpers/application_helper.rb
+index c96a562..ab65118 100644
+--- b/app/helpers/application_helper.rb
++++ a/app/helpers/application_helper.rb
+@@ -745,7 +743,7 @@ module ApplicationHelper
+                :id => wiki_page_id, :anchor => anchor, :parent => parent)
+             end
+           end
+-          link_to(title.present? ? title.html_safe : h(page), url, :class => ('wiki-page' + (wiki_page ? '' : ' new')))
++          link_to(title.present? ? title.html_safe : h(wiki_page ? wiki_page.pretty_title : page), url, :class => ('wiki-page' + (wiki_page ? '' : ' new')))
+         else
+           # project or wiki doesn't exist
+           all
