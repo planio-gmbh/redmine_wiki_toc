@@ -5,8 +5,10 @@ module RedmineWikiToc
     included do
       acts_as_list :scope => 'parent_id #{parent_id ? "= #{parent_id}" : "IS NULL"} AND wiki_id = #{wiki_id}'
 
-      before_save :update_number
-      before_create :generate_number
+      before_create :assign_number
+      before_update :assign_number_if_parent_id_changed
+      before_update lambda { |p| p.assign_number if p.position_changed? }
+      after_update lambda { |p| children.includes(:parent).each { |t| t.assign_number; t.save } if p.changed.include?("number") }
 
       alias_method_chain :pretty_title, :number
       class_attribute :number_prefix_disabled_tmp
@@ -35,32 +37,32 @@ module RedmineWikiToc
 
     def decrement_positions_on_higher_items_with_number_assign
       decrement_positions_on_higher_items_without_number_assign
-      self.class.regenerate_numbers(wiki_id, parent_id)
+      self.class.assign_numbers(wiki_id, parent_id)
     end
 
     def decrement_positions_on_lower_items_with_number_assign
       decrement_positions_on_lower_items_without_number_assign
-      self.class.regenerate_numbers(wiki_id, parent_id)
+      self.class.assign_numbers(wiki_id, parent_id)
     end
 
     def increment_positions_on_higher_items_with_number_assign
       increment_positions_on_higher_items_without_number_assign
-      self.class.regenerate_numbers(wiki_id, parent_id)
+      self.class.assign_numbers(wiki_id, parent_id)
     end
 
     def increment_positions_on_lower_items_with_number_assign
       increment_positions_on_lower_items_without_number_assign
-      self.class.regenerate_numbers(wiki_id, parent_id)
+      self.class.assign_numbers(wiki_id, parent_id)
     end
 
     def increment_positions_on_all_items_with_number_assign
       increment_positions_on_all_items_without_number_assign
-      self.class.regenerate_numbers(wiki, parent_id)
+      self.class.assign_numbers(wiki, parent_id)
     end
 
     module ClassMethods
-      def regenerate_numbers(wiki_id, parent_id)
-        self.where(:wiki_id => wiki_id, :parent_id => parent_id).each { |p| p.generate_number; p.save }
+      def assign_numbers(wiki_id, parent_id)
+        self.where(:wiki_id => wiki_id, :parent_id => parent_id).each { |p| p.assign_number; p.save }
       end
 
       def with_disabled_number_prefix
@@ -71,32 +73,18 @@ module RedmineWikiToc
       end
     end
 
-    def assign_number(parent = nil)
-      parent ||= self.parent
-      self.number = (parent && parent.number.present? && parent.number+"." || "")+position.to_s
+    def assign_number
+      self.number = (parent && parent.number.present? && parent.number+"." || "") + position.to_s
     end
 
-    def generate_number
+    def assign_number_if_parent_id_changed
+      return unless parent_id_changed?
+      # Can't use decrement_positions_on_lower_items here because parent_id has changed
+      self.class.where(:wiki_id => wiki_id, :parent_id => parent_id_was).where(["position > ?", position]).update_all("position = position - 1")
+      self.class.assign_numbers(wiki_id, parent_id_was)
+      add_to_list_bottom
+      parent.try(&:reload)
       assign_number
-      return unless number_changed?
-      parents = {id => self}
-      descendants.each do |c|
-        parent = parents[c.parent_id] ||= c.parent.reload
-        c.assign_number(parent)
-        c.save
-      end
-    end
-
-    def update_number
-      if parent_id_changed?
-        # Can't use decrement_positions_on_lower_items here because parent_id has changed
-        self.class.where("wiki_id = ? AND parent_id = ? AND position > ?", wiki_id, parent_id_was, position).update_all("position = position - 1")
-        self.class.regenerate_numbers(wiki_id, parent_id_was)
-        add_to_list_bottom
-        generate_number
-      elsif position_changed?
-        generate_number
-      end
     end
   end
 end
