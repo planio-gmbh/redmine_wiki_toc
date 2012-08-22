@@ -6,7 +6,7 @@ module RedmineWikiIndex
       desc "Displays a table of contents of Wiki. With no argument, it displays the child pages of the current wiki page. Examples:\n\n" +
              "  !{{wiki_toc}} -- can be used from a wiki page only\n" +
              "  !{{wiki_toc(Foo)}} -- lists all children of page Foo\n" +
-             "  !{{wiki_toc(Foo, parent=1)}} -- shows a higher level of page hierarchy including Foo and all Foo's children\n"
+             "  !{{wiki_toc(Foo, parent=1)}} -- shows a higher level of page hierarchy including Foo and all Foo's children\n" +
              "  !{{wiki_toc(Foo, depth=1)}} -- lists all children of page Foo down to specified depth\n" +
              "  !{{wiki_toc(reorder=1)}} -- shows reorder links\n" +
              "  !{{wiki_toc(highlight=1)}} -- highlight current or specified page\n" +
@@ -48,7 +48,11 @@ module RedmineWikiIndex
           :reorder_links => options[:reorder].present?,
           :project => project
         content = "".html_safe
-        content << content_tag('h3', link_to(options[:header], {:controller => 'wiki', :action => 'table_of_contents', :project_id => project})) if options[:header]
+        if options[:header]
+          header = options[:header]
+          header = link_to(header, {:controller => 'wiki', :action => 'table_of_contents', :project_id => project}) if User.current.allowed_to?(:view_wiki_toc, project)
+          content << content_tag('h3', header)
+        end
         content << render_wiki_toc(pages, start_page, options)
       end
       desc "Displays a link to the table of contents. Examples:\n\n" +
