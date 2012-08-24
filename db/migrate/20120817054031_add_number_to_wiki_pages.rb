@@ -1,12 +1,12 @@
 class AddNumberToWikiPages < ActiveRecord::Migration
-  def up
+  def self.up
     add_column :wiki_pages, :number, :string, :null => false
     WikiPage.reset_column_information
     WikiPage.transaction do
-      WikiPage.where(:parent_id => nil).each { |p| p.generate_number; p.save }
+      WikiPage.find(:all, :conditions => {:parent_id => nil}).each { |p| p.assign_number; p.save }
     end
   end
-  def down
+  def self.down
     remove_column :wiki_pages, :number
   end
 end

@@ -14,7 +14,7 @@ module RedmineWikiToc
       highlight = options[:highlight]
       parent = options[:parent] && options[:parent].visible? && options.delete(:parent)
       reorder = options[:reorder_links] && User.current.allowed_to?(:reorder_wiki_pages, options[:project] || @project)
-      node_id = node.try(&:id)
+      node_id = node.try(:id)
       unless depth
         content << "<div class='wiki-toc #{"reorder" if reorder}'>"
         if parent
@@ -26,7 +26,7 @@ module RedmineWikiToc
       end
       if pages[node_id]
         _depth = depth || 0
-        _depth_remains = options[:depth] && options[:depth] - _depth
+        _depth_remains = options[:depth] && (options[:depth] - _depth)
         content << "<ul class='pages-hierarchy #{node_id && "node-#{node_id}" || "root"}'>"
         pages[node_id].select {|page| page.visible?}.each do |page|
           content << "<li class='item-#{page.id}'>"
@@ -46,19 +46,36 @@ module RedmineWikiToc
       end
       content.html_safe
     end
-    def reorder_links_remote(name, url, method = :post)
-      link_to(image_tag('2uparrow.png', :alt => l(:label_sort_highest)),
-              url.merge({"#{name}[move_to]" => 'highest'}),
-              :method => method, :title => l(:label_sort_highest), :remote => true) +
-      link_to(image_tag('1uparrow.png',   :alt => l(:label_sort_higher)),
-              url.merge({"#{name}[move_to]" => 'higher'}),
-             :method => method, :title => l(:label_sort_higher), :remote => true) +
-      link_to(image_tag('1downarrow.png', :alt => l(:label_sort_lower)),
-              url.merge({"#{name}[move_to]" => 'lower'}),
-              :method => method, :title => l(:label_sort_lower), :remote => true) +
-      link_to(image_tag('2downarrow.png', :alt => l(:label_sort_lowest)),
-              url.merge({"#{name}[move_to]" => 'lowest'}),
-             :method => method, :title => l(:label_sort_lowest), :remote => true)
+    if Redmine::VERSION::MAJOR >= 2
+      def reorder_links_remote(name, url, method = :post)
+        link_to(image_tag('2uparrow.png', :alt => l(:label_sort_highest)),
+                url.merge({"#{name}[move_to]" => 'highest'}),
+                :method => method, :title => l(:label_sort_highest), :remote => true) +
+        link_to(image_tag('1uparrow.png', :alt => l(:label_sort_higher)),
+                url.merge({"#{name}[move_to]" => 'higher'}),
+               :method => method, :title => l(:label_sort_higher), :remote => true) +
+        link_to(image_tag('1downarrow.png', :alt => l(:label_sort_lower)),
+                url.merge({"#{name}[move_to]" => 'lower'}),
+                :method => method, :title => l(:label_sort_lower), :remote => true) +
+        link_to(image_tag('2downarrow.png', :alt => l(:label_sort_lowest)),
+                url.merge({"#{name}[move_to]" => 'lowest'}),
+               :method => method, :title => l(:label_sort_lowest), :remote => true)
+      end
+    else
+      def reorder_links_remote(name, url, method = :post)
+        link_to_remote(image_tag('2uparrow.png', :alt => l(:label_sort_highest)),
+                {:url => url.merge({"#{name}[move_to]" => 'highest'}), :method => method},
+                :title => l(:label_sort_highest)) +
+        link_to_remote(image_tag('1uparrow.png', :alt => l(:label_sort_higher)),
+                {:url => url.merge({"#{name}[move_to]" => 'higher'}), :method => method},
+                :title => l(:label_sort_higher)) +
+        link_to_remote(image_tag('1downarrow.png', :alt => l(:label_sort_lower)),
+                {:url => url.merge({"#{name}[move_to]" => 'lower'}), :method => method},
+                :title => l(:label_sort_lower)) +
+        link_to_remote(image_tag('2downarrow.png', :alt => l(:label_sort_lowest)),
+                {:url => url.merge({"#{name}[move_to]" => 'lowest'}), :method => method},
+                :title => l(:label_sort_lowest))
+      end
     end
   end
 end

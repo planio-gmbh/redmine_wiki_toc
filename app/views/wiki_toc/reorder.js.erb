@@ -1,2 +1,7 @@
+<% if Redmine::VERSION::MAJOR >= 2 && Redmine::VERSION::MINOR >= 1 %>
 $('.wiki-toc.reorder <%= @parent ? ".node-#{@parent.id}" : ".root" %>').replaceWith("<%= j render_wiki_toc(@pages, @parent, {:reorder_links => true, :depth => @depth}, 0) %>");
 $('.wiki-toc.reorder .item-<%= @page.id %>').effect('highlight');
+<% else %>
+$$('.wiki-toc.reorder <%= @parent ? ".node-#{@parent.id}" : ".root" %>').invoke("replace", "<%= escape_javascript render_wiki_toc(@pages, @parent, {:reorder_links => true, :depth => @depth}, 0) %>");
+$$('.wiki-toc.reorder .item-<%= @page.id %>').each(function(e) { new Effect.Highlight(e); });
+<% end %>

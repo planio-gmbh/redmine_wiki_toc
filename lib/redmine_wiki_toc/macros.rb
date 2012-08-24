@@ -23,25 +23,24 @@ module RedmineWikiIndex
         end
         wiki = page && page.wiki || @project && @project.wiki
         project = page && page.project || @project
+        start_page = nil
         return unless project && project.module_enabled?(:wiki_toc)
         return "" unless User.current.allowed_to?(:view_wiki_toc, project)
-        if page
-          if options[:root] || options[:parent] && !page.parent_id
-            start_page = nil
-            pages = wiki.pages.where(:parent_id => nil)
+        if !page || options[:root]
+          pages = wiki.pages.find(:all)
+        else
+          if options[:parent] && !page.parent_id
+            pages = wiki.pages.find(:all, :conditions => {:parent_id => nil})
           else
             start_page = options[:parent] ? page.parent : page
             pages = [start_page] + start_page.children
           end
           pages += page.descendants if page
           pages.uniq!
-          pages.sort_by! {|p| p.position}
-        else
-          start_page = nil
-          pages = wiki.pages.reorder(:position)
         end
+        pages.sort!
         pages = pages.group_by(&:parent_id)
-        return "" unless pages[start_page.try(&:id)]
+        return "" unless pages[start_page.try(:id)]
         options.merge! :depth => options[:depth] && options[:depth].to_i,
           :highlight => options[:highlight] && page,
           :parent => options[:parent] && page && page.parent,

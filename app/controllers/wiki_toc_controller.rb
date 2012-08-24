@@ -1,4 +1,5 @@
 class WikiTocController < ApplicationController
+  unloadable
 
   before_filter :find_wiki
   before_filter :find_existing_page, :only => [:reorder]
@@ -8,8 +9,7 @@ class WikiTocController < ApplicationController
     @page.update_attributes(params[:page])
     @parent = @page.parent
     @pages = @parent ? @parent.descendants : @wiki.pages
-    @pages.sort_by! {|p| p.position}
-    @pages = @pages.group_by(&:parent_id)
+    @pages = @pages.sort.group_by(&:parent_id)
     @depth = params[:depth].to_i if params[:depth]
     respond_to do |format|
       format.js

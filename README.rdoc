@@ -4,13 +4,13 @@ This plug-in allows to order Wiki pages and adds a macro to display the table of
 
 == Compatibility
 
-This plug-in is compatible with Redmine >= 2.0.0
+This plug-in is compatible with Redmine 1.4.x, 2.0.x, 2.1.x
 
 == Installation And Configuration
 
 From a ZIP file:
 * Download the latest version of the plugin
-* Unzip to */plugins* folder of Redmine
+* Unzip to */plugins* (Redmine 2.x) or */vendor/plugins* (Redmine 1.x) folder of Redmine
 
 From a GIT repository:
 * Clone repository with <b>git clone git://git.academ.org/redmine_wiki_toc.git plugins/redmine_wiki_toc</b> command
@@ -19,7 +19,7 @@ Patch Redmine (optional):
 * Use <b>wiki_links_with_pretty_title.patch</b> to force Redmine to use formatted title for Wiki links (so the [[Wiki TOC plug-in]] transforms to "1.1.2. Wiki TOC plug-in"). This is a tiny patch, it should not break anything.
 
 After download:
-1. Run <b>rake redmine:plugins:migrate</b>.
+1. Run <b>rake redmine:plugins:migrate</b> (Redmine 2.x) or <b>rake db:migrate:plugins</b> (Redmine 1.x).
 2. Restart Redmine.
 3. Enable <b>"Table of contents of Wiki"</b> module for projects you need.
 4. Setup *permissions* for roles
@@ -64,4 +64,5 @@ If you need to move the page to another section (change the parent), open it and
 
 == Changelog
 
+[0.0.2] Compatibility with Redmine 1.4.x, 2.0.x
 [0.0.1] Initial commit
