@@ -1,5 +1,3 @@
-require 'redmine/wiki_formatting/macros'
-
 module RedmineWikiIndex
   module Macros
     Redmine::WikiFormatting::Macros.register do
