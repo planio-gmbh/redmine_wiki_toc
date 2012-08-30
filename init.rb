@@ -33,7 +33,7 @@ Redmine::Plugin.register :redmine_wiki_toc do
   author_url 'http://redmine.academ.org'
   description 'Adds ability to reorder wiki pages and show an ordered table of contents of Wiki'
   url "http://redmine.academ.org"
-  version '0.0.2'
+  version '0.0.3'
 
   project_module :wiki_toc do
     permission :reorder_wiki_pages, { :wiki_toc => [:reorder] }

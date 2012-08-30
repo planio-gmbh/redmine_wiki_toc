@@ -64,5 +64,6 @@ If you need to move the page to another section (change the parent), open it and
 
 == Changelog
 
+[0.0.3] Fixed bugs, added Chinese translation
 [0.0.2] Compatibility with Redmine 1.4.x, 2.0.x
 [0.0.1] Initial commit

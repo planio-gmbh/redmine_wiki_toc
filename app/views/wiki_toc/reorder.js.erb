@@ -1,4 +1,4 @@
-<% if Redmine::VERSION::MAJOR >= 2 && Redmine::VERSION::MINOR >= 1 %>
+<% if (Redmine::VERSION::ARRAY <=> [2, 1, 0]) > 0 %>
 $('.wiki-toc.reorder <%= @parent ? ".node-#{@parent.id}" : ".root" %>').replaceWith("<%= j render_wiki_toc(@pages, @parent, {:reorder_links => true, :depth => @depth}, 0) %>");
 $('.wiki-toc.reorder .item-<%= @page.id %>').effect('highlight');
 <% else %>
