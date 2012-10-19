@@ -3,3 +3,4 @@ ru:
   permission_reorder_wiki_pages: "Изменение порядка Wiki страниц"
   permission_view_wiki_toc: "Просмотр оглавления Wiki"
   label_table_of_contents: "Оглавление"
+  label_enable_numeric_prefix: "Отображать числовой префикс (1.1.2.) для этой страницы"

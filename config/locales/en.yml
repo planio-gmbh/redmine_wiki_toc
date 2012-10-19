@@ -3,3 +3,4 @@ en:
   permission_reorder_wiki_pages: "Reorder wiki pages"
   permission_view_wiki_toc: "View table of contents of Wiki"
   label_table_of_contents: "Table of contents"
+  label_enable_numeric_prefix: "Show numeric prefix (eg 1.1.2.) for this page"

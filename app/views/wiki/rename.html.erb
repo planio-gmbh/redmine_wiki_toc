@@ -1,0 +1,12 @@
+<% if @project.module_enabled?(:wiki_toc) %>
+  <% html = Nokogiri::HTML.fragment(render(:parent)) %>
+  <% html.at_css("form div.box") << capture do %>
+    <p><label for="wiki_page_number_enabled"><%= l(:label_enable_numeric_prefix) %></label>
+      <%= hidden_field_tag "wiki_page[number_enabled]", "0" %>
+      <%= check_box_tag "wiki_page[number_enabled]", "1", @page.number_enabled? %>
+    </p>
+  <% end %>
+  <%= raw html %>
+<% else %>
+  <%= render :parent %>
+<% end %>
