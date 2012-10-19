@@ -9,6 +9,9 @@ module RedmineWikiToc
         before_create :add_to_list_bottom
         before_create :assign_number
         before_update :assign_number, :if => lambda { |p| p.position_changed? || p.number_delta_changed? }
+        before_destroy :unless => :number_enabled? do |p|
+          p.adjust_positions_on_lower_items(0, 1)
+        end
         before_destroy :remove_from_list
 
         before_update :if => :parent_id_changed? do |p|
